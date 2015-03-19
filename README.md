@@ -14,7 +14,9 @@ $ make
 ```
 $ ./agent_2048 # with training parameters
 ```
-Training and waiting
+![](./screenshot/parameter_explaination.png)
+
+* Training and waiting
 
 ![](./screenshot/2048_training_start.png)  -->  ![](./screenshot/2048_training_done.png)
 

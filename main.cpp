@@ -750,7 +750,7 @@ void PlayNRounds( )
 void ShowExplain( )
 {
     printf( "Format: ./agent_2048 ExpID TrainTimes method choose_m update_m cumulative alpha  beta setPrint setTest\n" ) ;
-    printf( "Ex:   $ ./agent_2048     1    500000       1        4        1          0 0.0100  1.0        0       0\n" ) ;
+    printf( "Ex:   $ ./agent_2048     1    500000       1        4        1          0 0.0100  1.0        0       0\n\n" ) ;
     printf( "ExpID: customized recorded file's ID\n" ) ;
     printf( "TrainTime: Number of games for the 2048 gamer during learning process\n" ) ;
     printf( "choose_m: 0~9; Original: 0, UCB0: 1, UCB1and2: 2,8, TD1and2: 4,6, DefineFunc1and2: 5,7, DefFunc+UCB1and2: 3,9\n" ) ;
@@ -767,7 +767,7 @@ int main(int argc, char* argv[])
     if( argc != 11 )
     {
         printf( "Parameters Error!\n" ) ;
-        printf( "ShowExplain\n" ) ;
+        ShowExplain( ) ;
         return 0 ;
     }
 
