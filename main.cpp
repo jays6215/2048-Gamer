@@ -110,7 +110,6 @@ struct STATUS
     int access ;
 };
 /* Feature recoredrs */
-//map<unsigned long long, STATUS> boards;
 unordered_map<unsigned long long, STATUS> boards;
 vector <int>    fea[ FEATURESIZE ] ;
 STATUS small_boards[ FEATURESIZE ][ FEAKINDS ] ; // 17 * 18 ^ 4
@@ -502,11 +501,12 @@ void PlayNRounds( )
                              * UCB   -----> 17 or 18(myF)
                              ********************************************************/
 
-                            /* 15. V(s'_next) + Reward_next  */ // YYYYYYYYYYYYYYYYYYYYYYYYYYYY
+                            /* 15. V(s'_next) + Reward_next  */
+                            /* 17. V(s') + alpha * ( Reward_next + V(s'_next) - V(s') */
                             if( update_m == 15 )
                             {
                                 diff = asn_val[d] + tmp[1] ;
-                                upds = tmp[0] + alpha * ( tmp[1] + ( asn_val[d] - as_val ) ) ;
+                                upds = tmp[0] + alpha * ( tmp[1] + asn_val[d] - as_val ) ;
                             }
                             /* 16. V(s') + alpha * ( Reward_next + V(s'_next_Merges) + V(s'_next_AvgValueOfTiles) - V(s'_AvgValueOfTiles) + V(s'_next) - V(s') */
                             else if( update_m == 16 )
@@ -514,13 +514,13 @@ void PlayNRounds( )
                                 diff = asn_val[d] + ( tmp[1] + tmp[3] + tmp[2] - tmp[4] ) ;
                                 upds = tmp[0] + alpha * ( tmp[1] + tmp[3] + tmp[2] - tmp[4] + asn_val[d] - as_val ) ;
                             }
-                            /* 17. V(s') + alpha * ( Reward_next + V(s'_next_Merges) + V(s'_next_AvgValueOfTiles) - V(s'_AvgValueOfTiles) + V(s'_next) - V(s') */
+                            /* 17. V(s') + alpha * ( Reward_next + V(s'_next) - V(s') with UCB diff */
                             else if( update_m == 17 )
                             {
                                 diff = asn_val[d] + tmp[1] + beta * sqrt( log(tol_c) / cnt_a[d] ) ;
                                 upds = tmp[0] + alpha * ( tmp[1] + asn_val[d] - as_val ) ;
                             }
-                            /* 18. V(s') + alpha * ( Reward_next + V(s'_next_Merges) + V(s'_next_AvgValueOfTiles) - V(s'_AvgValueOfTiles) + V(s'_next) - V(s') */
+                            /* 18. V(s') + alpha * ( Reward_next + V(s'_next_Merges) + V(s'_next_AvgValueOfTiles) - V(s'_AvgValueOfTiles) + V(s'_next) - V(s') with UCB diff */
                             else if( update_m == 18 )
                             {
                                 diff = asn_val[d] + tmp[1] + tmp[3] + tmp[2] - tmp[4] + beta * sqrt( log(tol_c) / cnt_a[d] ) ;
@@ -747,19 +747,29 @@ void PlayNRounds( )
         }
     }
 }
-
+void ShowExplain( )
+{
+    printf( "Format: ./agent_2048 ExpID TrainTimes method choose_m update_m cumulative alpha  beta setPrint setTest\n" ) ;
+    printf( "Ex:   $ ./agent_2048     1    500000       1        4        1          0 0.0100  1.0        0       0\n" ) ;
+    printf( "ExpID: customized recorded file's ID\n" ) ;
+    printf( "TrainTime: Number of games for the 2048 gamer during learning process\n" ) ;
+    printf( "choose_m: 0~9; Original: 0, UCB0: 1, UCB1and2: 2,8, TD1and2: 4,6, DefineFunc1and2: 5,7, DefFunc+UCB1and2: 3,9\n" ) ;
+    printf( "update_m: 15~18; TD:15,16, TD+UCB diff: 17,18\n" ) ;
+    printf( "cumulative mode: 0 = not cumulative, 1 = cumulative\n" ) ;
+    printf( "alpha: TD learning rate: 0.0000 ~ 0.0100\n" ) ;
+    printf( "beta: UCB ratio: 0.0 ~ 1.0\n" ) ;
+    printf( "setPrint: 0 = not show the boards, 1 = show the boards\n" ) ;
+    printf( "setTest: 0 = Training 2048 gamer, 1 = Testing gamer\n" ) ;
+}
 int main(int argc, char* argv[])
 {
     /* Parameters setting */
     if( argc != 11 )
     {
         printf( "Parameters Error!\n" ) ;
-        printf( "Format: ./a.out ExpID TrainTimes method choose_m update_m cumulative alpha  beta setPrint setTest\n" ) ;
-        printf( "Ex:   $ ./a.out     1    500000        1       4        1          0 0.0100  1.0        0       0\n" ) ;
+        printf( "ShowExplain\n" ) ;
         return 0 ;
     }
-    // Format:./a.out ExpID TrainTimes method choose_m update_m cumulative alpha  beta
-    // Ex:  $ ./a.out     1    500000        1       4        1          0 0.0100  1.0
 
     ExpTs      = atoi(argv[1]) ;            // - RunTime
     TrainTs    = atoi(argv[2]) ;            // - TID
